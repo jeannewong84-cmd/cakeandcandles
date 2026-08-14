@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0,user-scalable=no">
+
+<title>Jeanne's 20th Birthday Quiz 🥳</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f4e8ff, #ffffff);
+    color: #4b3869;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.app {
+    width: 100%;
+    max-width: 520px;
+}
+
+.card {
+    background: white;
+    border-radius: 28px;
+    padding: 28px 23px;
+    box-shadow: 0 12px 35px rgba(145, 92, 190, 0.18);
+    border: 2px solid #ead8fa;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 { color: #8e5bb7; text-align: center; margin-bottom: 12px; }
+h2 { color: #8e5bb7; margin-bottom: 16px; }
+h3 { color: #8e5bb7; margin-bottom: 12px; }
+
+.subtitle {
+    text-align: center;
+    color: #8d819a;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.chapter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+}
+
+.chapter-title {
+    font-size: 27px;
+    font-weight: bold;
+    color: #8e5bb7;
+    margin-bottom: 15px;
+}
+
+.chapter-description {
+    color: #8d819a;
+    line-height: 1.5;
+}
+
+.question-number {
+    font-size: 13px;
+    font-weight: bold;
+    color: #aa7acb;
+    margin-bottom: 9px;
+}
+
+.question {
+    font-size: 18px;
+    line-height: 1.5;
+    color: #463750;
+    margin-bottom: 18px;
+    white-space: pre-line;
+}
+
+textarea {
+    width: 100%;
+    min-height: 160px;
+    resize: vertical;
+    border: 2px solid #dbc0ef;
+    border-radius: 18px;
+    padding: 15px;
+    font-size: 15px;
+    line-height: 1.5;
+    outline: none;
+    color: #44364e;
+    background: #fdfaff;
+}
+
+textarea:focus {
+    border-color: #a46bc9;
+    box-shadow: 0 0 0 3px rgba(164,107,201,.12);
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #dbc0ef;
+    border-radius: 15px;
+    font-size: 16px;
+    outline: none;
+    text-align: center;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.primary {
+    background: #a46bc9;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 16px;
+    width: 100%;
+    margin-top: 18px;
+    box-shadow: 0 5px 12px rgba(164,107,201,.25);
+}
+
+.primary:active { transform: scale(.98); }
+
+.secondary {
+    background: #eee0f8;
+    color: #8053a2;
+    padding: 12px 18px;
+    border-radius: 14px;
+}
+
+.nav {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.nav button { flex: 1; }
+
+.hidden { display: none !important; }
+
+.progress {
+    height: 7px;
+    background: #eee5f5;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #a46bc9;
+    width: 0%;
+    transition: width .25s;
+}
+
+.candles {
+    font-size: 28px;
+    line-height: 1.7;
+    margin: 20px 0;
+}
+
+.big { font-size: 34px; }
+
+.note {
+    font-size: 13px;
+    color: #9689a0;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+@media(max-width: 450px) {
+    .card { padding: 23px 17px; }
+    .question { font-size: 17px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+<div class="card">
+
+    <!-- WELCOME -->
+    <section id="welcome">
+        <div class="chapter">
+            <div class="big">🥳</div>
+            <h1>Welcome!!!</h1>
+            <div class="chapter-title">To<br>My 20th Birthday Quiz🥳</div>
+            <p class="subtitle">
+                Yoohooo!<br><br>
+                It's 20 questions of course cause I'm turning 20!
+            </p>
+            <input id="nameInput" type="text" placeholder="Enter your name..." autocomplete="off">
+            <button class="primary" onclick="startQuiz()">Next —&gt;</button>
+        </div>
+    </section>
+
+    <!-- RULES -->
+    <section id="rules" class="hidden">
+        <div class="chapter">
+            <div class="big">📜</div>
+            <h1>Rules!!</h1>
+            <p class="subtitle">
+                I actually put a lot of thought into these, so please answer them properly!!🥹
+                I genuinely want to know your answers.
+                <br><br>
+                And yes, some of them might be a little too personal. Deal with it. 🥱😝
+                <br><br>
+                You can compare your answers with mine at the end of the quiz if you want to like in the last one!!✌🏾
+            </p>
+            <button class="primary" onclick="showChapter(1)">Next —&gt;</button>
+        </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="hidden">
+        <div class="progress">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <div class="question-number" id="questionNumber"></div>
+        <div class="question" id="questionText"></div>
+        <textarea id="answerBox" placeholder="Type your answer here..." autocomplete="off" spellcheck="true"></textarea>
+        <div class="note">You can go back and change your answer whenever you want. 🥰</div>
+        <div class="nav">
+            <button class="secondary" id="backButton" onclick="previousQuestion()">← Back</button>
+            <button class="primary" id="nextButton" onclick="nextQuestion()">Next →</button>
+        </div>
+    </section>
+
+    <!-- CHAPTER -->
+    <section id="chapterScreen" class="hidden">
+        <div class="chapter">
+            <div class="chapter-title" id="chapterTitle"></div>
+            <p class="chapter-description" id="chapterDescription"></p>
+            <button class="primary" onclick="continueFromChapter()">Next —&gt;</button>
+        </div>
+    </section>
+
+    <!-- FINISHED -->
+    <section id="finished" class="hidden">
+        <div class="chapter">
+            <div class="big">🎂✨</div>
+            <h1>CONGRATULATIONS!!</h1>
+            <h2>You survived all 20 questions! 🥳</h2>
+            <div class="candles">
+                🕯️🕯️🕯️🕯️🕯️<br>🕯️🕯️🕯️🕯️🕯️<br>🕯️🕯️🕯️🕯️🕯️<br>🕯️🕯️🕯️🕯️🕯️
+            </div>
+            <button class="primary" onclick="showFeedback()">Continue 🥳</button>
+        </div>
+    </section>
+
+    <!-- FEEDBACK -->
+    <section id="feedback" class="hidden">
+        <div class="chapter">
+            <div class="big">🥹</div>
+            <h1>One last thing...</h1>
+            <h2>How was the quiz?</h2>
+            <p class="subtitle">
+                Did you like the quiz or not? 🤔<br>
+                Is there something you wanna ask me after replying to all these questions?
+            </p>
+            <textarea id="feedbackBox" placeholder="Tell me what you think..." autocomplete="off"></textarea>
+            <button class="primary" onclick="submitFeedback()">Send my reply 💌</button>
+        </div>
+    </section>
+
+    <!-- JEANNE ANSWERS -->
+    <section id="jeanneAnswers" class="hidden">
+        <div class="chapter">
+            <div class="big">🥰</div>
+            <h1>Here we are!</h1>
+            <h2>Jeanne's answers🥺</h2>
+            <p class="subtitle">Click below if you wanna compare our replies!</p>
+            <button class="primary" onclick="startComparison()">Compare our replies 💜</button>
+        </div>
+    </section>
+
+    <!-- COMPARISON -->
+    <section id="comparison" class="hidden">
+        <div class="progress">
+            <div id="compareProgress" class="progress-bar"></div>
+        </div>
+        <div class="question-number" id="compareNumber"></div>
+        <div class="question" id="compareQuestion"></div>
+        <h3>Gordo's reply 🫵🏾</h3>
+        <div id="hisReply" style="background:#f8f1fc; padding:15px; border-radius:16px; white-space:pre-wrap; line-height:1.5; margin-bottom:18px;"></div>
+        <h3>Jeanne's reply 🥰</h3>
+        <div id="myReply" style="background:#fff8fc; padding:15px; border-radius:16px; white-space:pre-wrap; line-height:1.5;"></div>
+        <div class="nav">
+            <button class="secondary" id="compareBack" onclick="previousComparison()">← Back</button>
+            <button class="primary" id="compareNext" onclick="nextComparison()">Next →</button>
+        </div>
+    </section>
+
+</div>
+</div>
+
+<script>
+/* =========================================================
+   FIREBASE
+========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyCOrNtMFUCMvoMh82HbfesEnBBstzWXtck",
+    authDomain: "quizjeanne.firebaseapp.com",
+    databaseURL: "https://quizjeanne-default-rtdb.firebaseio.com",
+    projectId: "quizjeanne",
+    storageBucket: "quizjeanne.firebasestorage.app",
+    messagingSenderId: "877384786635",
+    appId: "1:877384786635:web:a3c3e895908b0b85ab314e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+/* =========================================================
+   QUESTIONS & JEANNE'S ANSWERS
+========================================================= */
+const questions = [
+{ chapter: 1, text: "Do you think you really know yourself? Why or why not? 🪞" },
+{ chapter: 1, text: "What are your hobbies? Since when have they been your hobbies? And which one is your favorite? Why? 🎨" },
+{ chapter: 1, text: "When was the last time you cried? I mean cried for real to the point that you were sobbing and all that. 😭 What happened that got you into that state? 🥺" },
+{ chapter: 1, text: "What's the most embarrassing thing that has ever happened to you? 😭" },
+{ chapter: 1, text: "What can genuinely make you mad? And why does it bother you so much? 😤" },
+{ chapter: 2, text: "What do you think you have to do to maintain a good friendship? 🤝" },
+{ chapter: 2, text: "What's the longest friendship you have? How did you two become friends, and what do you think made the friendship last so long? 🫂" },
+{ chapter: 2, text: "What qualities do you think are important in a friend? Why those qualities? 💭" },
+{ chapter: 2, text: "Have you ever experienced a friendship breakup? If yes, what happened? And how do you feel about it today? 💔" },
+{ chapter: 2, text: "Tell me the nicest thing a friend has ever done to/for you. Something that will probably stay with you FOREVER. I want the whole story 😮‍💨 🥹" },
+{ chapter: 3, text: "Tomorrow morning…\nEveryone in the world forgets who you are except one person.\nWho do you hope still remembers you? Why? 🌎" },
+{ chapter: 3, text: "You wake up tomorrow with the ability to master one skill instantly. What skill do you choose? Why that one? ✨" },
+{ chapter: 3, text: "What's something you've completely changed your mind about during the last year? What made you change your opinion? 🤔" },
+{ chapter: 3, text: "Do you think you're easily influenced by other people? Why or why not? 🧠" },
+{ chapter: 3, text: "If you could go back in time and re-live one single 24-hour period of your life (not to change anything, just to experience it again), which day are you picking? And what happened on that day? ⏳" },
+{ chapter: 4, text: "What's something you've done that you're genuinely proud of, but you don't usually tell people about? Why are you proud of it? 🥹" },
+{ chapter: 4, text: "What's something you wish people asked you about more often? 💭" },
+{ chapter: 5, text: "What was your first impression of me? And has that impression changed since then? 👀" },
+{ chapter: 5, text: "Am I similar to any of your friends?\n\nIf yes, who do I remind you of and in what way?\n\nAnd if no… good. 😌 I like being unique. 🫵🏾" },
+{ chapter: 5, text: "What's your favorite thing about me? And why that? 🥺" }
+];
+
+const jeanneAnswers = [
+`Honestly yeah, for the most part. I know what I like, what I don’t like, what I care about and what I don’t really care about. But obviously there’s still things I don’t know about myself because you can’t know everything about yourself until you’re put in certain situations. So I’d say I know myself pretty well but I’m still figuring some things out.🥰`,
+`Reading, drawing, singing, listening to music, playing, watching K-dramas… I’ve had some of these hobbies for YEARS! especially singing, reading and drawing. Singing is my favorite for sure. Because I always get a lot of compliments when I sing. I like hearing my friends and my family compliment me everytime I sing!\n\nOops! I almost forgot texting Luis as one of my hobbies!😳`,
+`Last weekend, I was arguing with a friend and my big heart can’t handle conflicts so I cried so much because of that. I’m such a crybaby. I cry for nothing and everything.😞✌🏾`,
+`Sigh… 😞 I really don’t wanna tell you because it’s so fucking embarrassing but… fine.\n\nWhen I was 11, during holidays, I was at my grandma’s house in my village with ALL my brothers and my cousins yeahhh🥰. And then what happened? I fell off the chair I was sitting on😭. And unfortunately, I had nothing under my dress because all my underwear was dirty. My aunt had told me I was old enough to wash them myself already, so I had just pouted and put my dress on anyway😭. So when I fell from that chair in the most unfortunate position imaginable, all my cousins and my brothers saw everything and started laughing at me. It was SO fucking embarrassing I felt like dying on the spot.😭💔 They laughed at me so much that I cried, and then the next day I had the worst headache ever. And they STILL kept making fun of me.\n\nI will never forget that day.😭💔`,
+`So many things can get me mad. Take some notes Gordo!\n\nLies.\nFake promises.\nFake apologies.\nBeing ignored.\nBeing left on delivered for 24hrs+ with no valid reason.\nBeing accused of something I didn’t do.\nPeople assuming things about me without even asking me first.\nPeople who don’t reply to all my questions.😞`,
+`Be honest. Communicate when something is wrong. Actually respect the other person. Enjoy talking to each other. And don’t make everything about yourself. Also you have to give each other space sometimes. You don’t need to talk every single day to still be friends.`,
+`My longest friendship is about 10 years old, I think. She talked to me first. She was showing off her Violetta and Barbie stickers and colors to me and I was SO pissed because I wanted the same stickers. Then she gave me two stickers and my heart immediately melted🫠.\n\nI think it lasted because we don’t force anything. We can go a while without talking and then just talk normally again.`,
+`Honesty, loyalty, kindness, understanding and being able to joke around. I don’t want someone who’s going to agree with everything I say just because we’re friends🫤. I’d rather have someone who can tell me when I’m wrong. And obviously someone who doesn’t switch up when things get difficult🫩. And also effort because I don’t think a friendship can survive if only one person is trying. Kindness is because my big big heart likes that.🥹🥰`,
+`Yeah. A few times actually🫩.\n\nSome hurt more than others but I think eventually you just accept that some friendships aren’t meant to last forever. Sometimes nobody is necessarily the villain. People just change. And sometimes you realize you were the problem too😔✌🏾`,
+`Probably when one of my ex friends helped me during a really difficult time without making me explain everything.\n\nShe just noticed I wasn’t okay and stayed with me. I don’t remember exactly what she said anymore but I remember that she stayed. I think that’s more meaningful to me than someone saying a bunch of nice things.\n\nAlso, we weren’t in good terms at that time anymore. But she still stayed by my side. That means so much to me till this day.`,
+`Hmm… my mom. I just know that if she’s the one who remembers me, everything will be okay for me.`,
+`Drawing. Definitely!!\n\nI already love drawing, so being able to instantly become insanely good at it would be amazing. I’d want to be able to draw exactly what I imagine in my head without struggling to get it onto paper.`,
+`Huhhhh… women can date younger men. 😭\n\nI used to think it was weird and that they shouldn’t do it, but then one of my friends started dating a guy who’s two years younger than her. At first I was judging her so bad 😭 but then I realized… why do I even care? It’s literally their relationship. Then I started seeing more people doing it and hearing other people’s opinions about it and I eventually stopped caring. So yeah, I changed my mind. People can date whoever they want. It has nothing to do with me. 😭\n\nAnd now I’m actually happy for my friend, which is crazy considering how much I used to judge her for it. 💀`,
+`Nah I’m not easily influenced. Because ughhh idk honestly I just know that I’m not easily influenced!😭`,
+`My 16th birthday! 🥹\n\nThat day we celebrated both my birthday and my graduation, so basically all my family and all my friends were there. I was SO fucking happy that day. It’s crazy because I genuinely don’t think I’ve ever been happier than I was that day. I’d want to relive the whole thing, the preparations, getting ready, the party itself, everything. And I received SO many gifts that day. 😭 I don’t think I’ve ever received that many gifts again. Yeah. I’d happily live that day again.`,
+`Probably something creative I’ve made. I don’t really tell people about things I’m proud of because then it feels like I’m showing off 😭 But if I spent a lot of time on something and actually finished it, I’m proud of myself for that.`,
+`Probably what Im actually thinking about. People ask what happened or what Im doing but not always what Im thinking about. Although sometimes I don’t even know what I’m thinking about myself, I just know that I’m thinking.🤔`,
+`My first impression of you was that you had a serious problem. You used to abuse of the 🤑 emoji so much.\n\nNah I still think that you have a serious problem. There’s something wrong with you. How could you even think that I’m Asian? Oh my days…`,
+`You’re like none of my friends which is also pretty normal cause all my friends are adults and you’re a little baby 🥹 soooooo yeah… And all my friends reply to all my questions unlike you.😑😞`,
+`You already know that it’s your honesty! I already told you. Unless you forgot? Well consider this a reminder then.✌🏾`
+];
+
+/* =========================================================
+   STATE & TRACKING METRICS
+========================================================= */
+let currentScreen = "welcome";
+let currentQuestion = 0;
+let currentSubmissionId = null;
+
+let answers = Array(20).fill("");
+let history = Array.from({length:20}, () => []);
+let feedback = "";
+let feedbackHistory = [];
+let comparisonIndex = 0;
+
+// Tracking state for admin calculations
+let qStartTime = 0;
+let isEditedThisSession = false;
+let stats = {}; // stores visits, duration, edits, clicks per question
+
+/* =========================================================
+   TRACKING HELPERS
+========================================================= */
+function initQuestionStats(qIdx) {
+    if (!stats[qIdx]) {
+        stats[qIdx] = {
+            visits: 0,
+            timeSpent: 0,
+            previousClicks: 0,
+            nextClicks: 0,
+            edits: 0
+        };
+    }
+}
+
+function logEvent(qIdx, type, extraData = {}) {
+    if (!currentSubmissionId) return;
+    const eventObj = {
+        type: type,
+        time: firebase.database.ServerValue.TIMESTAMP,
+        ...extraData
+    };
+    database.ref(`submissions/${currentSubmissionId}/activity/${qIdx}`).push(eventObj);
+}
+
+function saveStats(qIdx) {
+    if (!currentSubmissionId) return;
+    database.ref(`submissions/${currentSubmissionId}/questionStats/${qIdx}`).update(stats[qIdx]);
+}
+
+function leaveCurrentQuestion() {
+    if (currentScreen === "quiz" && qStartTime > 0) {
+        const duration = Date.now() - qStartTime;
+        initQuestionStats(currentQuestion);
+        stats[currentQuestion].timeSpent += duration;
+        
+        logEvent(currentQuestion, "leave");
+        saveStats(currentQuestion);
+        qStartTime = 0;
+    }
+}
+
+function enterQuestion(qIdx) {
+    leaveCurrentQuestion();
+    currentQuestion = qIdx;
+    qStartTime = Date.now();
+    isEditedThisSession = false;
+
+    initQuestionStats(currentQuestion);
+    stats[currentQuestion].visits += 1;
+
+    logEvent(currentQuestion, "enter");
+    saveStats(currentQuestion);
+
+    renderQuestion();
+}
+
+/* =========================================================
+   SCREEN CONTROL
+========================================================= */
+function hideAll() {
+    ["welcome", "rules", "quiz", "chapterScreen", "finished", "feedback", "jeanneAnswers", "comparison"].forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+    });
+}
+
+function show(id) {
+    if (id !== "quiz") {
+        leaveCurrentQuestion();
+    }
+    hideAll();
+    document.getElementById(id).classList.remove("hidden");
+    currentScreen = id;
+}
+
+/* =========================================================
+   START
+========================================================= */
+function startQuiz() {
+    const name = document.getElementById("nameInput").value.trim();
+    if (!name) {
+        alert("Enter your name first 🥹");
+        return;
+    }
+
+    currentSubmissionId = database.ref("submissions").push().key;
+
+    database.ref("submissions/" + currentSubmissionId).set({
+        name: name,
+        startedAt: firebase.database.ServerValue.TIMESTAMP,
+        answers: {},
+        history: {},
+        questionStats: {},
+        activity: {}
+    });
+
+    show("rules");
+}
+
+/* =========================================================
+   CHAPTERS
+========================================================= */
+function showChapter(chapter) {
+    const titles = {
+        1: "Chapter 1 — About You🫵🏾",
+        2: "Chapter 2 — Friendships!!!",
+        3: "Chapter 3 — Scenarios 📝",
+        4: "Chapter 4 — About You again cause why not 🥹",
+        5: "Chapter 5 — About Me"
+    };
+
+    const descriptions = {
+        1: "Let's start with YOU. I wanna know more about the person answering all these questions. 👀",
+        2: "Okayyy now let's talk about friendships!!! I wanna know how you see them and what matters to you. 🤝",
+        3: "Time for some scenarios and questions that might make your brain work a little. 📝",
+        4: "Back to you again because apparently 5 questions weren't enough. 🥹",
+        5: "And finally… let's talk about ME. 😌"
+    };
+
+    document.getElementById("chapterTitle").textContent = titles[chapter];
+    document.getElementById("chapterDescription").textContent = descriptions[chapter];
+
+    show("chapterScreen");
+}
+
+function continueFromChapter() {
+    const chapterText = document.getElementById("chapterTitle").textContent;
+    let targetIndex = 0;
+
+    if (chapterText.includes("Chapter 1")) targetIndex = 0;
+    else if (chapterText.includes("Chapter 2")) targetIndex = 5;
+    else if (chapterText.includes("Chapter 3")) targetIndex = 10;
+    else if (chapterText.includes("Chapter 4")) targetIndex = 15;
+    else targetIndex = 17;
+
+    enterQuestion(targetIndex);
+}
+
+/* =========================================================
+   QUESTION DISPLAY
+========================================================= */
+function renderQuestion() {
+    hideAll();
+    document.getElementById("quiz").classList.remove("hidden");
+    currentScreen = "quiz";
+
+    const q = questions[currentQuestion];
+    document.getElementById("questionNumber").textContent = `QUESTION ${currentQuestion + 1} / 20`;
+    document.getElementById("questionText").textContent = q.text;
+    document.getElementById("answerBox").value = answers[currentQuestion] || "";
+
+    const progress = ((currentQuestion + 1) / 20) * 100;
+    document.getElementById("progressBar").style.width = progress + "%";
+    document.getElementById("backButton").disabled = currentQuestion === 0;
+    document.getElementById("nextButton").textContent = currentQuestion === 19 ? "Finish 🎂" : "Next →";
+}
+
+/* =========================================================
+   SAVE TYPING HISTORY & EDITS TRACKING
+========================================================= */
+const answerBox = document.getElementById("answerBox");
+
+answerBox.addEventListener("input", function() {
+    if (!currentSubmissionId) return;
+
+    const value = this.value;
+    answers[currentQuestion] = value;
+
+    history[currentQuestion].push({
+        value: value,
+        time: Date.now()
+    });
+
+    database.ref(`submissions/${currentSubmissionId}/answers/${currentQuestion}`).set(value);
+    database.ref(`submissions/${currentSubmissionId}/history/${currentQuestion}`).set(history[currentQuestion]);
+
+    // Count edit once per visit if typing occurs
+    if (!isEditedThisSession) {
+        isEditedThisSession = true;
+        initQuestionStats(currentQuestion);
+        stats[currentQuestion].edits += 1;
+        logEvent(currentQuestion, "edit");
+        saveStats(currentQuestion);
+    }
+});
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+function nextQuestion() {
+    answers[currentQuestion] = document.getElementById("answerBox").value;
+
+    initQuestionStats(currentQuestion);
+    stats[currentQuestion].nextClicks += 1;
+    logEvent(currentQuestion, "next");
+
+    if (currentQuestion === 19) {
+        leaveCurrentQuestion();
+        database.ref(`submissions/${currentSubmissionId}`).update({
+            completedAt: firebase.database.ServerValue.TIMESTAMP
+        });
+        show("finished");
+        return;
+    }
+
+    const nextQIdx = currentQuestion + 1;
+    const previousChapter = questions[currentQuestion].chapter;
+    const newChapter = questions[nextQIdx].chapter;
+
+    if (previousChapter !== newChapter) {
+        leaveCurrentQuestion();
+        showChapter(newChapter);
+        return;
+    }
+
+    enterQuestion(nextQIdx);
+}
+
+function previousQuestion() {
+    if (currentQuestion === 0) return;
+
+    answers[currentQuestion] = document.getElementById("answerBox").value;
+
+    initQuestionStats(currentQuestion);
+    stats[currentQuestion].previousClicks += 1;
+    logEvent(currentQuestion, "previous");
+
+    const prevQIdx = currentQuestion - 1;
+    const currentChapter = questions[currentQuestion].chapter;
+    const previousChapter = questions[prevQIdx].chapter;
+
+    if (previousChapter !== currentChapter) {
+        leaveCurrentQuestion();
+        showChapter(previousChapter);
+        return;
+    }
+
+    enterQuestion(prevQIdx);
+}
+
+/* =========================================================
+   FEEDBACK
+========================================================= */
+function showFeedback() {
+    show("feedback");
+    document.getElementById("feedbackBox").value = feedback;
+}
+
+const feedbackBox = document.getElementById("feedbackBox");
+
+feedbackBox.addEventListener("input", function() {
+    if (!currentSubmissionId) return;
+
+    feedback = this.value;
+    feedbackHistory.push({
+        value: feedback,
+        time: Date.now()
+    });
+
+    database.ref(`submissions/${currentSubmissionId}/feedback`).set(feedback);
+    database.ref(`submissions/${currentSubmissionId}/feedbackHistory`).set(feedbackHistory);
+});
+
+function submitFeedback() {
+    feedback = document.getElementById("feedbackBox").value;
+    database.ref(`submissions/${currentSubmissionId}`).update({
+        feedback: feedback,
+        feedbackSubmittedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    show("jeanneAnswers");
+}
+
+/* =========================================================
+   COMPARISON
+========================================================= */
+function startComparison() {
+    comparisonIndex = 0;
+    logEvent(19, "compare"); // Track when he starts looking at your answers
+    renderComparison();
+}
+
+function renderComparison() {
+    show("comparison");
+    document.getElementById("compareNumber").textContent = `QUESTION ${comparisonIndex + 1} / 20`;
+    document.getElementById("compareQuestion").textContent = questions[comparisonIndex].text;
+    document.getElementById("hisReply").textContent = answers[comparisonIndex] || "(No answer)";
+    document.getElementById("myReply").textContent = jeanneAnswers[comparisonIndex];
+
+    const progress = ((comparisonIndex + 1) / 20) * 100;
+    document.getElementById("compareProgress").style.width = progress + "%";
+    document.getElementById("compareBack").disabled = comparisonIndex === 0;
+    document.getElementById("compareNext").textContent = comparisonIndex === 19 ? "Done ✓" : "Next →";
+}
+
+function nextComparison() {
+    if (comparisonIndex === 19) {
+        show("jeanneAnswers");
+        return;
+    }
+    comparisonIndex++;
+    renderComparison();
+}
+
+function previousComparison() {
+    if (comparisonIndex === 0) return;
+    comparisonIndex--;
+    renderComparison();
+}
+</script>
+
+</body>
+</html>
